@@ -11,11 +11,12 @@ from django.contrib.auth.models import(
 
 class UserManager(BaseUserManager):
     """Manager for users."""
-    def create_user(self,email,password=None,**extr_fields):
+    def create_user(self, email, password=None, **extr_fields):
         """Create, Save, Return a new user."""
-        user = self.model(email=email,**extr_fields)
+        user = self.model(email=self.normalize_email(email), **extr_fields)
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
+        return user
 
 class User(AbstractBaseUser, PermissionsMixin):
     """user in the system."""
@@ -24,4 +25,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    USERNAME = email
+    objects = UserManager()
+    USERNAME_FIELD = 'email'
