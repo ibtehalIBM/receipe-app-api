@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-
+from decimal import Decimal
 
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
@@ -122,12 +122,12 @@ class PrivateUserAPITests(TestCase):
         )
 
         self.client = APIClient()
-        self.client.force_autheticate(user = self.user)
+        self.client.force_authenticate(user = self.user)
 
     def test_retrieve_profile_success(self):
         """Test retrieving profile for logged in user."""
         res = self.client.get(ME_URL)
-        self.asserEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
             'name': self.user.name,
             'email': self.user.email,
@@ -136,7 +136,7 @@ class PrivateUserAPITests(TestCase):
     def test_post_me_not_allowed(self):
         """Test post not allowed for me endpoint."""
         res = self.client.post(ME_URL, {})
-        self.asserEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_update_user_profile(self):
         """Test updating user profile for authenticated users"""
@@ -147,5 +147,5 @@ class PrivateUserAPITests(TestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.name, payload['name'])
         self.assertTrue(self.user.check_password(payload['password']))
-        self.asserEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
